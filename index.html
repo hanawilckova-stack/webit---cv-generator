@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web IT – CV Generator</title>
+
+  <!-- Google Fonts: Space Grotesk + Oxanium -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oxanium:wght@400;600;700&display=swap" rel="stylesheet" />
+
+
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Space Grotesk', sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+      font-size: 14px;
+    }
+
+    /* ============================================================
+       LAYOUT: SPLIT SCREEN
+    ============================================================ */
+    #form-panel {
+      width: 42%;
+      overflow-y: auto;
+      padding: 24px 20px;
+      border-right: 1px solid #E0E0E0;
+      background: #f7f7f7;
+    }
+
+    #preview-panel {
+      width: 58%;
+      overflow-y: auto;
+      padding: 24px;
+      background: #e8e8e8;
+    }
+
+    /* ============================================================
+       FORM STYLES
+    ============================================================ */
+    .form-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .form-header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    #btn-export {
+      background: #F63147;
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 6px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    #btn-export:hover {
+      background: #d4203a;
+    }
+
+    .form-section {
+      margin-bottom: 20px;
+    }
+
+    .form-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #888;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #E0E0E0;
+    }
+
+    .form-row {
+      margin-bottom: 8px;
+    }
+
+    .form-row label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 3px;
+    }
+
+    .form-row input,
+    .form-row textarea,
+    .form-row select {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      background: #fff;
+      color: #1a1a1a;
+      outline: none;
+    }
+
+    .form-row input:focus,
+    .form-row textarea:focus {
+      border-color: #F63147;
+    }
+
+    .form-row textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    /* Dynamic item cards */
+    .dynamic-item {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+
+    .dynamic-item-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .dynamic-item-header input {
+      flex: 1;
+      padding: 6px 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .dynamic-item-header input:focus {
+      border-color: #F63147;
+    }
+
+    .btn-remove {
+      background: none;
+      border: 1px solid #ddd;
+      color: #999;
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-remove:hover {
+      border-color: #F63147;
+      color: #F63147;
+    }
+
+    .btn-add {
+      background: none;
+      border: 1px dashed #bbb;
+      color: #888;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .btn-add:hover {
+      border-color: #F63147;
+      color: #F63147;
+    }
+
+    .btn-add-bullet {
+      background: none;
+      border: 1px dashed #ddd;
+      color: #aaa;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .btn-add-bullet:hover {
+      border-color: #F63147;
+      color: #F63147;
+    }
+
+    .bullet-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .bullet-row input {
+      flex: 1;
+      padding: 5px 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .bullet-row input:focus {
+      border-color: #F63147;
+    }
+
+    .lang-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .lang-row input {
+      flex: 1;
+      padding: 6px 9px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .lang-row input:focus {
+      border-color: #F63147;
+    }
+
+    /* ============================================================
+       PREVIEW: A4 DOCUMENT
+    ============================================================ */
+    #preview {
+      background: #fff;
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: 32px 40px 80px 40px; /* bottom padding for footer space */
+      box-sizing: border-box;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.18);
+      position: relative;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #1a1a1a;
+    }
+
+    /* ============================================================
+       PREVIEW: HEADER
+    ============================================================ */
+    .cv-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .cv-name {
+      font-size: 43px;
+      font-weight: 700;
+      font-family: 'Oxanium', sans-serif;
+      color: #111E2D;
+      line-height: 1;
+      margin-right: 4px;
+    }
+
+    .cv-role-badge {
+      background: #F63147;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Oxanium', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .cv-experience {
+      color: #F63147;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Oxanium', sans-serif;
+      white-space: nowrap;
+    }
+
+    /* ============================================================
+       PREVIEW: SECTION BOX
+    ============================================================ */
+    .cv-section {
+      background: #F7F7F7;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+
+    /* Info box (Dostupnost…) — pouze tato sekce má border, žádný fill */
+    .cv-section.cv-section--info {
+      background: #fff;
+      border: 1px solid #E0E0E0;
+    }
+
+    .cv-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Oxanium', sans-serif;
+      color: #111E2D;
+      margin-bottom: 12px;
+    }
+
+    /* ============================================================
+       PREVIEW: INFO BOX
+    ============================================================ */
+    .cv-info-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .cv-info-table td {
+      padding: 6.5px 0;
+      vertical-align: top;
+    }
+
+    .cv-info-label {
+      color: #677489;
+      font-size: 12px;
+      font-weight: 700;
+      width: 195px;
+      padding-right: 12px;
+    }
+
+    .cv-info-value {
+      color: #1a1a1a;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* ============================================================
+       PREVIEW: SKILLS
+    ============================================================ */
+    .cv-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .cv-tag {
+      background: #E5E5E5;
+      border: none;
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Oxanium', sans-serif;
+      color: #111E2D;
+    }
+
+    .cv-skills-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      gap: 0;
+    }
+
+    .cv-skills-label {
+      color: #677489;
+      font-size: 12px;
+      font-weight: 700;
+      width: 195px;
+      flex-shrink: 0;
+      padding-right: 14px;
+    }
+
+    .cv-skills-value {
+      color: #1a1a1a;
+      font-size: 12px;
+      font-weight: 400;
+      flex: 1;
+    }
+
+    /* ============================================================
+       PREVIEW: LANGUAGES
+    ============================================================ */
+    .cv-lang-row {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 3px;
+      gap: 6px;
+    }
+
+    .cv-lang-name {
+      font-weight: 700;
+      font-size: 12px;
+      color: #1a1a1a;
+    }
+
+    .cv-lang-name::after {
+      content: ':';
+    }
+
+    .cv-lang-level {
+      font-size: 12px;
+      font-weight: 400;
+      color: #1a1a1a;
+    }
+
+    .cv-lang-section-label {
+      color: #677489;
+      font-size: 12px;
+      font-weight: 700;
+      width: 195px;
+      flex-shrink: 0;
+      padding-top: 1px;
+      padding-right: 14px;
+    }
+
+    .cv-lang-list {
+      flex: 1;
+    }
+
+    /* ============================================================
+       PREVIEW: WORK EXPERIENCE
+    ============================================================ */
+    .cv-work-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      margin-bottom: 10px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .cv-work-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .cv-work-position {
+      width: 195px;
+      flex-shrink: 0;
+      padding-top: 2px;
+      padding-right: 14px;
+    }
+
+    .cv-work-position-badge {
+      background: #E5E5E5;
+      border: none;
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Oxanium', sans-serif;
+      color: #111E2D;
+      white-space: nowrap;
+      display: inline-block;
+    }
+
+    .cv-work-bullets {
+      flex: 1;
+      padding-top: 2px;
+    }
+
+    .cv-work-bullets ul {
+      list-style: disc;
+      list-style-position: inside;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .cv-work-bullets ul li {
+      font-size: 12px;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+      line-height: 1.45;
+    }
+
+    /* ============================================================
+       PREVIEW: PERSONAL SKILLS
+    ============================================================ */
+    .cv-personal-text {
+      font-size: 12px;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+
+    /* ============================================================
+       PREVIEW: EDUCATION
+    ============================================================ */
+    .cv-edu-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      margin-bottom: 10px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .cv-edu-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .cv-edu-years {
+      color: #677489;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+      width: 195px;
+      padding-right: 14px;
+    }
+
+    .cv-edu-details {
+      flex: 1;
+    }
+
+    .cv-edu-institution {
+      font-size: 12px;
+      font-weight: 400;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+      line-height: 1.45;
+    }
+
+    .cv-edu-degree {
+      font-size: 12px;
+      font-weight: 400;
+      color: #1a1a1a;
+      line-height: 1.45;
+    }
+
+    /* ============================================================
+       PAGE BREAK INDICATOR
+    ============================================================ */
+    .page-break-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 0;
+      border-top: 2px dashed #F63147;
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .page-break-line::after {
+      content: 'Konec stránky';
+      position: absolute;
+      right: 0;
+      top: 3px;
+      font-size: 10px;
+      color: #F63147;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* ============================================================
+       PREVIEW: FOOTER
+    ============================================================ */
+    .cv-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 14px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+    }
+
+    .cv-footer-logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .cv-footer-contacts {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .cv-footer-contact-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      color: #111E2D;
+    }
+
+    .cv-footer-contact-item svg {
+      flex-shrink: 0;
+    }
+
+    /* ============================================================
+       PRINT / PDF EXPORT
+    ============================================================ */
+    @media print {
+      @page {
+        size: A4;
+        /* margin-top: 32px = mezera nahoře na KAŽDÉ stránce (včetně první).
+           Ostatní strany nulové — browser URL a čísla stránek se nevejdou
+           do 32px a zůstanou skryté.                                       */
+        margin: 32px 0 0 0;
+      }
+
+      /* Zachovej barvy a pozadí */
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      body {
+        display: block;
+        height: auto;
+        overflow: visible;
+      }
+
+      #form-panel           { display: none !important; }
+      .page-break-line      { display: none !important; }
+
+      #preview-panel {
+        width: 100% !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        background: none !important;
+        height: auto !important;
+      }
+
+      #preview {
+        box-shadow: none !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        width: 210mm !important;
+        min-height: auto !important;
+        /* Horní mezeru zajišťuje @page margin: 32px — zde 0 */
+        padding-top: 0 !important;
+        padding-left: 40px !important;
+        padding-right: 40px !important;
+        padding-bottom: 80px !important; /* footer (~48px) + 32px mezera */
+      }
+
+      /* Footer fixovaný na spodku každé stránky */
+      .cv-footer {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+      }
+
+      /* ── JOB ITEM: nedělitelný ───────────────────────────────────
+         Pracovní pozice se nikdy nerozdělí uprostřed.
+         JS přidá break-before: page pokud se nevejde na stránku.
+         CSS break-inside: avoid je záloha pro prohlížeč.
+      ─────────────────────────────────────────────────────────── */
+      .cv-work-item {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      /* ── ATOMICKÉ SEKCE: nikdy se nerozdělí ─────────────────────
+         Info box, skills, osobnostní dovednosti, vzdělání.
+         JS přidá break-before: page pokud se nevejdou na stránku.
+         CSS break-inside: avoid zabrání jejich rozříznutí.
+      ─────────────────────────────────────────────────────────── */
+      #prev-info-section,
+      #prev-skills-section,
+      #prev-personal-section,
+      #prev-edu-section {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     FORM PANEL (LEFT)
+============================================================ -->
+<div id="form-panel">
+
+  <div class="form-header">
+    <h1>CV Generator</h1>
+    <button id="btn-export">Exportovat PDF</button>
+  </div>
+
+  <!-- HEADER INFO -->
+  <div class="form-section">
+    <div class="form-section-title">Základní informace</div>
+    <div class="form-row">
+      <label>Křestní jméno</label>
+      <input type="text" id="f-name" placeholder="např. Lukáš" />
+    </div>
+    <div class="form-row">
+      <label>Role / Pozice</label>
+      <input type="text" id="f-role" placeholder="např. PHP DEVELOPER" />
+    </div>
+    <div class="form-row">
+      <label>Léta zkušeností</label>
+      <input type="text" id="f-exp" placeholder="např. 11+ let zkušeností" />
+    </div>
+  </div>
+
+  <!-- INFO BOX -->
+  <div class="form-section">
+    <div class="form-section-title">Info box</div>
+    <div class="form-row">
+      <label>Dostupnost</label>
+      <input type="text" id="f-dostupnost" placeholder="např. Až 160 hodin měsíčně" />
+    </div>
+    <div class="form-row">
+      <label>Forma spolupráce</label>
+      <input type="text" id="f-forma" placeholder="např. IČO" />
+    </div>
+    <div class="form-row">
+      <label>Lokalita</label>
+      <input type="text" id="f-lokalita" placeholder="např. Praha/Brno/remote" />
+    </div>
+    <div class="form-row">
+      <label>Typ spolupráce</label>
+      <input type="text" id="f-typ" placeholder="např. Remote/hybrid" />
+    </div>
+    <div class="form-row">
+      <label>MD rate</label>
+      <input type="text" id="f-rate" placeholder="např. 8 000 Kč" />
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="form-section">
+    <div class="form-section-title">Odborné dovednosti</div>
+    <div class="form-row">
+      <label>Hlavní skills (oddělte čárkou)</label>
+      <input type="text" id="f-skills" placeholder="PHP, HTML 5, XML, CSS 3…" />
+    </div>
+    <div class="form-row">
+      <label>Databázové systémy</label>
+      <input type="text" id="f-db" placeholder="např. SQL, MySQL" />
+    </div>
+    <div class="form-row">
+      <label>Další</label>
+      <input type="text" id="f-dalsi" placeholder="např. Git, Linux, Docker…" />
+    </div>
+  </div>
+
+  <!-- LANGUAGES -->
+  <div class="form-section">
+    <div class="form-section-title">Jazykové znalosti</div>
+    <div id="lang-list"></div>
+    <button class="btn-add" id="btn-add-lang">+ Přidat jazyk</button>
+  </div>
+
+  <!-- WORK EXPERIENCE -->
+  <div class="form-section">
+    <div class="form-section-title">Pracovní zkušenosti</div>
+    <div id="work-list"></div>
+    <button class="btn-add" id="btn-add-work">+ Přidat zkušenost</button>
+  </div>
+
+  <!-- PERSONAL SKILLS -->
+  <div class="form-section">
+    <div class="form-section-title">Osobnostní dovednosti</div>
+    <div class="form-row">
+      <textarea id="f-personal" placeholder="např. Analytické a komunikační schopnosti, zodpovědnost, proaktivita"></textarea>
+    </div>
+  </div>
+
+  <!-- EDUCATION -->
+  <div class="form-section">
+    <div class="form-section-title">Vzdělání</div>
+    <div id="edu-list"></div>
+    <button class="btn-add" id="btn-add-edu">+ Přidat vzdělání</button>
+  </div>
+
+</div><!-- /form-panel -->
+
+
+<!-- ============================================================
+     PREVIEW PANEL (RIGHT)
+============================================================ -->
+<div id="preview-panel">
+  <div id="preview">
+
+    <!-- HEADER -->
+    <div class="cv-header" id="prev-header"></div>
+
+    <!-- INFO BOX -->
+    <div class="cv-section cv-section--info" id="prev-info-section">
+      <table class="cv-info-table" id="prev-info-table"></table>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="cv-section" id="prev-skills-section">
+      <div class="cv-section-title">Odborné dovednosti a znalosti</div>
+      <div class="cv-tags" id="prev-tags"></div>
+      <div id="prev-db-row" class="cv-skills-row">
+        <span class="cv-skills-label">Databázové systémy</span>
+        <span class="cv-skills-value" id="prev-db-val"></span>
+      </div>
+      <div id="prev-dalsi-row" class="cv-skills-row">
+        <span class="cv-skills-label">Další</span>
+        <span class="cv-skills-value" id="prev-dalsi-val"></span>
+      </div>
+      <div id="prev-lang-row" class="cv-skills-row">
+        <span class="cv-lang-section-label">Jazykové znalosti</span>
+        <div class="cv-lang-list" id="prev-lang-list"></div>
+      </div>
+    </div>
+
+    <!-- WORK EXPERIENCE -->
+    <div class="cv-section" id="prev-work-section">
+      <div class="cv-section-title">Pracovní zkušenosti</div>
+      <div id="prev-work-list"></div>
+    </div>
+
+    <!-- PERSONAL SKILLS -->
+    <div class="cv-section" id="prev-personal-section">
+      <div class="cv-section-title">Osobnostní dovednosti</div>
+      <div class="cv-personal-text" id="prev-personal-text"></div>
+    </div>
+
+    <!-- EDUCATION -->
+    <div class="cv-section" id="prev-edu-section">
+      <div class="cv-section-title">Vzdělání</div>
+      <div id="prev-edu-list"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="cv-footer">
+      <!-- Logo -->
+      <div class="cv-footer-logo">
+        <svg width="80" height="23" viewBox="0 0 80 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.6645 4.90783L23.0293 4.41539H25.1814L27.2059 14.629H27.4065L29.5769 5.61914H32.1668L34.3372 14.629H34.5378L36.5623 4.41539H38.7144L39.0792 4.90783L36.617 17H32.4403L30.8718 10.3429L29.3033 17H25.1267L22.6645 4.90783ZM39.8548 14.0454V10.3247C39.8548 8.35492 40.8396 7.37004 42.8094 7.37004H45.1804C47.1502 7.37004 48.1351 8.35492 48.1351 10.3247V13.1152H42.3717V14.2277C42.3717 14.6168 42.5662 14.8114 42.9553 14.8114H47.7703V16.1793L46.676 17H42.8094C40.8396 17 39.8548 16.0151 39.8548 14.0454ZM42.3717 11.1819H45.6181V10.1423C45.6181 9.75321 45.4236 9.55867 45.0345 9.55867H42.9553C42.5662 9.55867 42.3717 9.75321 42.3717 10.1423V11.1819ZM50.0689 17V3.50347H52.5858V7.37004H55.3946C57.3643 7.37004 58.3492 8.35492 58.3492 10.3247V14.0454C58.3492 16.0151 57.3643 17 55.3946 17H50.0689ZM52.5858 14.8114H55.2487C55.6378 14.8114 55.8323 14.6168 55.8323 14.2277V10.1423C55.8323 9.75321 55.6378 9.55867 55.2487 9.55867H52.5858V14.8114ZM64.2964 17V4.41539H66.9228V17H64.2964ZM68.3019 6.78641V4.41539H78.5885V6.78641H74.7584V17H72.132V6.78641H68.3019Z" fill="#111E2D"/>
+          <path d="M0 16.5514V13.9688H2.62635V16.5514H0Z" fill="#F63147"/>
+          <path d="M3.65942 16.5515V11.3862H6.28578V16.5515H3.65942Z" fill="#F63147"/>
+          <path d="M7.31885 16.5516V8.80371H9.9452V16.5516H7.31885Z" fill="#F63147"/>
+          <path d="M10.9782 16.5513V6.2207H13.6046V16.5513H10.9782Z" fill="#F63147"/>
+          <path d="M14.6376 16.5514V3.63818H17.264V16.5514H14.6376Z" fill="#111E2D"/>
+          <path d="M18.2971 16.5514V13.9688H20.9234V16.5514H18.2971Z" fill="#111E2D"/>
+        </svg>
+      </div>
+      <!-- Kontaktní údaje -->
+      <div class="cv-footer-contacts">
+        <div class="cv-footer-contact-item">
+          <!-- Envelope icon -->
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip-env)">
+              <path d="M0.0315094 2.2402C0.0950437 1.96181 0.251228 1.71324 0.474482 1.53521C0.697736 1.35718 0.974827 1.26023 1.26037 1.26025H8.82262C9.10817 1.26023 9.38526 1.35718 9.60852 1.53521C9.83177 1.71324 9.98795 1.96181 10.0515 2.2402L5.0415 5.30228L0.0315094 2.2402ZM0 2.95987V7.43672L3.65698 5.19451L0 2.95987ZM4.2607 5.56443L0.120366 8.1022C0.222662 8.3179 0.384116 8.50012 0.585937 8.62764C0.787757 8.75515 1.02164 8.82273 1.26037 8.8225H8.82262C9.06132 8.82256 9.29511 8.75483 9.49682 8.6272C9.69852 8.49957 9.85984 8.31729 9.962 8.10157L5.82167 5.5638L5.0415 6.04086L4.2607 5.5638V5.56443ZM6.42602 5.19514L10.083 7.43672V2.95987L6.42602 5.19451V5.19514Z" fill="#111E2D"/>
+            </g>
+            <defs><clipPath id="clip-env"><rect width="10.083" height="10.083" fill="white"/></clipPath></defs>
+          </svg>
+          info@1webit.cz
+        </div>
+        <div class="cv-footer-contact-item">
+          <!-- Telephone icon -->
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip-tel)">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M1.1882 0.321503C1.29847 0.211402 1.43087 0.125992 1.57665 0.0709341C1.72242 0.0158757 1.87823 -0.00757422 2.03375 0.00213836C2.18927 0.0118509 2.34095 0.0545042 2.47874 0.127272C2.61653 0.200039 2.73728 0.301259 2.83299 0.424223L3.96418 1.87744C4.17151 2.144 4.24461 2.49124 4.16268 2.81894L3.81797 4.19905C3.80015 4.27053 3.80111 4.3454 3.82077 4.4164C3.84042 4.4874 3.8781 4.55212 3.93015 4.60426L5.47852 6.15263C5.53072 6.20478 5.59554 6.24252 5.66666 6.26218C5.73778 6.28183 5.81278 6.28274 5.88436 6.2648L7.26384 5.92009C7.42555 5.87965 7.59434 5.87651 7.75745 5.9109C7.92056 5.94529 8.07371 6.01631 8.20534 6.1186L9.65855 7.24915C10.181 7.65562 10.2289 8.4276 9.76127 8.89457L9.10966 9.54619C8.64332 10.0125 7.94633 10.2173 7.29661 9.98858C5.63366 9.40346 4.12379 8.45145 2.87899 7.20315C1.63077 5.95854 0.678762 4.44889 0.0935645 2.78617C-0.134563 2.13707 0.0702476 1.43946 0.536586 0.973117L1.1882 0.321503Z" fill="#111E2D"/>
+            </g>
+            <defs><clipPath id="clip-tel"><rect width="10.083" height="10.083" fill="white"/></clipPath></defs>
+          </svg>
+          +420 773 337 303
+        </div>
+        <div class="cv-footer-contact-item">
+          <!-- Web / Globe icon -->
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip-web)">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M3.60643 0.197123C2.64001 0.47864 1.78087 1.0449 1.14111 1.82202C0.501341 2.59915 0.11065 3.55105 0.0200043 4.55355H2.30572C2.43896 3.02801 2.88127 1.54555 3.60572 0.196409M2.30572 5.44641H0.0200043C0.110461 6.44895 0.500986 7.40094 1.14063 8.1782C1.78027 8.95545 2.63932 9.52187 3.60572 9.80355C2.88127 8.45441 2.43896 6.97195 2.30572 5.44641ZM4.75143 9.99427C3.88542 8.62077 3.35447 7.0629 3.20143 5.44641H6.79786C6.64483 7.0629 6.11388 8.62077 5.24786 9.99427C5.08249 10.0025 4.91681 10.0025 4.75143 9.99427ZM6.39429 9.80284C7.36058 9.5212 8.21956 8.95489 8.85919 8.17777C9.49882 7.40066 9.88941 6.44882 9.98 5.44641H7.69429C7.56105 6.97195 7.11874 8.45441 6.39429 9.80355M7.69429 4.55427H9.98C9.88955 3.55173 9.49902 2.59973 8.85938 1.82248C8.21974 1.04523 7.36068 0.478807 6.39429 0.197123C7.11874 1.54626 7.56105 3.02873 7.69429 4.55427ZM4.75143 0.00569432C4.91704 -0.00254915 5.08296 -0.00254915 5.24858 0.00569432C6.11434 1.37925 6.64505 2.93712 6.79786 4.55355H3.20215C3.35715 2.92712 3.88929 1.36784 4.75143 0.00569432Z" fill="#111E2D"/>
+            </g>
+            <defs><clipPath id="clip-web"><rect width="10" height="10" fill="white"/></clipPath></defs>
+          </svg>
+          www.1webit.cz
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /preview -->
+</div><!-- /preview-panel -->
+
+
+<script>
+  /* ============================================================
+     STATE: dynamic items
+  ============================================================ */
+  let languages = [];
+  let workItems = [];
+  let eduItems  = [];
+
+  let langId = 0;
+  let workId = 0;
+  let eduId  = 0;
+
+  /* ============================================================
+     HELPERS
+  ============================================================ */
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* ============================================================
+     RENDER FORM: LANGUAGES
+  ============================================================ */
+  function renderLangForm() {
+    const container = document.getElementById('lang-list');
+    container.innerHTML = '';
+    languages.forEach(lang => {
+      const div = document.createElement('div');
+      div.className = 'lang-row';
+      div.innerHTML = `
+        <input type="text" placeholder="Jazyk" value="${escHtml(lang.name)}" data-id="${lang.id}" data-field="name" />
+        <input type="text" placeholder="Úroveň" value="${escHtml(lang.level)}" data-id="${lang.id}" data-field="level" style="max-width:100px"/>
+        <button class="btn-remove" data-id="${lang.id}" data-type="lang">×</button>
+      `;
+      container.appendChild(div);
+    });
+    bindDynamicEvents();
+  }
+
+  /* ============================================================
+     RENDER FORM: WORK EXPERIENCE
+  ============================================================ */
+  function renderWorkForm() {
+    const container = document.getElementById('work-list');
+    container.innerHTML = '';
+    workItems.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'dynamic-item';
+      let bulletsHtml = item.bullets.map(b => `
+        <div class="bullet-row">
+          <input type="text" placeholder="Popis…" value="${escHtml(b.text)}" data-wid="${item.id}" data-bid="${b.id}" data-field="bullet" />
+          <button class="btn-remove" data-wid="${item.id}" data-bid="${b.id}" data-type="bullet">×</button>
+        </div>
+      `).join('');
+      div.innerHTML = `
+        <div class="dynamic-item-header">
+          <input type="text" placeholder="Název pozice" value="${escHtml(item.position)}" data-id="${item.id}" data-field="work-position" />
+          <button class="btn-remove" data-id="${item.id}" data-type="work">×</button>
+        </div>
+        <div class="bullet-list" data-wid="${item.id}">${bulletsHtml}</div>
+        <button class="btn-add-bullet" data-id="${item.id}" data-type="add-bullet">+ Přidat bullet point</button>
+      `;
+      container.appendChild(div);
+    });
+    bindDynamicEvents();
+  }
+
+  /* ============================================================
+     RENDER FORM: EDUCATION
+  ============================================================ */
+  function renderEduForm() {
+    const container = document.getElementById('edu-list');
+    container.innerHTML = '';
+    eduItems.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'dynamic-item';
+      div.innerHTML = `
+        <div class="dynamic-item-header">
+          <input type="text" placeholder="Časové rozmezí (např. 2018 - 2020)" value="${escHtml(item.years)}" data-id="${item.id}" data-field="edu-years" />
+          <button class="btn-remove" data-id="${item.id}" data-type="edu">×</button>
+        </div>
+        <div class="form-row" style="margin-bottom:4px">
+          <input type="text" placeholder="Instituce" value="${escHtml(item.institution)}" data-id="${item.id}" data-field="edu-institution" style="padding:5px 8px;font-size:12px" />
+        </div>
+        <div class="form-row">
+          <input type="text" placeholder="Obor / Titul" value="${escHtml(item.degree)}" data-id="${item.id}" data-field="edu-degree" style="padding:5px 8px;font-size:12px" />
+        </div>
+      `;
+      container.appendChild(div);
+    });
+    bindDynamicEvents();
+  }
+
+  /* ============================================================
+     BIND DYNAMIC EVENTS
+  ============================================================ */
+  function bindDynamicEvents() {
+    // Remove buttons
+    document.querySelectorAll('.btn-remove').forEach(btn => {
+      btn.onclick = (e) => {
+        const type = btn.dataset.type;
+        if (type === 'lang') {
+          languages = languages.filter(l => l.id != btn.dataset.id);
+          renderLangForm();
+        } else if (type === 'work') {
+          workItems = workItems.filter(w => w.id != btn.dataset.id);
+          renderWorkForm();
+        } else if (type === 'bullet') {
+          const wi = workItems.find(w => w.id == btn.dataset.wid);
+          if (wi) wi.bullets = wi.bullets.filter(b => b.id != btn.dataset.bid);
+          renderWorkForm();
+        } else if (type === 'edu') {
+          eduItems = eduItems.filter(ed => ed.id != btn.dataset.id);
+          renderEduForm();
+        }
+        updatePreview();
+      };
+    });
+
+    // Add bullet
+    document.querySelectorAll('[data-type="add-bullet"]').forEach(btn => {
+      btn.onclick = () => {
+        const wi = workItems.find(w => w.id == btn.dataset.id);
+        if (wi) { wi.bullets.push({ id: Date.now(), text: '' }); renderWorkForm(); }
+      };
+    });
+
+    // Input changes — languages
+    document.querySelectorAll('[data-field="name"], [data-field="level"]').forEach(input => {
+      input.oninput = () => {
+        const lang = languages.find(l => l.id == input.dataset.id);
+        if (lang) lang[input.dataset.field] = input.value;
+        updatePreview();
+      };
+    });
+
+    // Input changes — work position
+    document.querySelectorAll('[data-field="work-position"]').forEach(input => {
+      input.oninput = () => {
+        const wi = workItems.find(w => w.id == input.dataset.id);
+        if (wi) wi.position = input.value;
+        updatePreview();
+      };
+    });
+
+    // Input changes — bullets
+    document.querySelectorAll('[data-field="bullet"]').forEach(input => {
+      input.oninput = () => {
+        const wi = workItems.find(w => w.id == input.dataset.wid);
+        if (wi) {
+          const b = wi.bullets.find(b => b.id == input.dataset.bid);
+          if (b) b.text = input.value;
+        }
+        updatePreview();
+      };
+    });
+
+    // Input changes — education
+    document.querySelectorAll('[data-field^="edu-"]').forEach(input => {
+      input.oninput = () => {
+        const ei = eduItems.find(e => e.id == input.dataset.id);
+        if (ei) {
+          const key = input.dataset.field.replace('edu-', '');
+          ei[key] = input.value;
+        }
+        updatePreview();
+      };
+    });
+  }
+
+  /* ============================================================
+     ADD BUTTONS
+  ============================================================ */
+  document.getElementById('btn-add-lang').onclick = () => {
+    languages.push({ id: ++langId, name: '', level: '' });
+    renderLangForm();
+    updatePreview();
+  };
+
+  document.getElementById('btn-add-work').onclick = () => {
+    workItems.push({ id: ++workId, position: '', bullets: [{ id: Date.now(), text: '' }] });
+    renderWorkForm();
+    updatePreview();
+  };
+
+  document.getElementById('btn-add-edu').onclick = () => {
+    eduItems.push({ id: ++eduId, years: '', institution: '', degree: '' });
+    renderEduForm();
+    updatePreview();
+  };
+
+  /* ============================================================
+     STATIC INPUT LISTENERS
+  ============================================================ */
+  const staticIds = ['f-name','f-role','f-exp','f-dostupnost','f-forma','f-lokalita','f-typ','f-rate','f-skills','f-db','f-dalsi','f-personal'];
+  staticIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updatePreview);
+  });
+
+  /* ============================================================
+     UPDATE PREVIEW
+  ============================================================ */
+  function updatePreview() {
+    const name     = document.getElementById('f-name').value.trim();
+    const role     = document.getElementById('f-role').value.trim();
+    const exp      = document.getElementById('f-exp').value.trim();
+    const dostup   = document.getElementById('f-dostupnost').value.trim();
+    const forma    = document.getElementById('f-forma').value.trim();
+    const lok      = document.getElementById('f-lokalita').value.trim();
+    const typ      = document.getElementById('f-typ').value.trim();
+    const rate     = document.getElementById('f-rate').value.trim();
+    const skills   = document.getElementById('f-skills').value.trim();
+    const db       = document.getElementById('f-db').value.trim();
+    const dalsi    = document.getElementById('f-dalsi').value.trim();
+    const personal = document.getElementById('f-personal').value.trim();
+
+    /* --- HEADER --- */
+    const header = document.getElementById('prev-header');
+    header.innerHTML = '';
+    if (name) {
+      const nameEl = document.createElement('span');
+      nameEl.className = 'cv-name';
+      nameEl.textContent = name;
+      header.appendChild(nameEl);
+    }
+    if (role) {
+      const badge = document.createElement('span');
+      badge.className = 'cv-role-badge';
+      badge.textContent = role.toUpperCase();
+      header.appendChild(badge);
+    }
+    if (exp) {
+      const expEl = document.createElement('span');
+      expEl.className = 'cv-experience';
+      expEl.textContent = exp.toUpperCase();
+      header.appendChild(expEl);
+    }
+
+    /* --- INFO BOX --- */
+    const infoSection = document.getElementById('prev-info-section');
+    const infoTable   = document.getElementById('prev-info-table');
+    const infoRows = [
+      { label: 'Dostupnost',       value: dostup },
+      { label: 'Forma spolupráce', value: forma  },
+      { label: 'Lokalita',         value: lok    },
+      { label: 'Typ spolupráce',   value: typ    },
+      { label: 'MD rate',          value: rate   },
+    ].filter(r => r.value);
+
+    if (infoRows.length === 0) {
+      infoSection.style.display = 'none';
+    } else {
+      infoSection.style.display = '';
+      infoTable.innerHTML = infoRows.map(r => `
+        <tr>
+          <td class="cv-info-label">${escHtml(r.label)}</td>
+          <td class="cv-info-value">${escHtml(r.value)}</td>
+        </tr>
+      `).join('');
+    }
+
+    /* --- SKILLS SECTION --- */
+    const skillsSection = document.getElementById('prev-skills-section');
+    const tagsContainer = document.getElementById('prev-tags');
+    const dbRow    = document.getElementById('prev-db-row');
+    const dalsiRow = document.getElementById('prev-dalsi-row');
+    const langRow  = document.getElementById('prev-lang-row');
+    const langList = document.getElementById('prev-lang-list');
+
+    // Tags
+    const tagArr = skills.split(',').map(s => s.trim()).filter(Boolean);
+    if (tagArr.length) {
+      tagsContainer.innerHTML = tagArr.map(t => `<span class="cv-tag">${escHtml(t)}</span>`).join('');
+      tagsContainer.style.display = 'flex';
+    } else {
+      tagsContainer.innerHTML = '';
+      tagsContainer.style.display = 'none';
+    }
+
+    // DB
+    if (db) {
+      document.getElementById('prev-db-val').textContent = db;
+      dbRow.style.display = '';
+    } else {
+      dbRow.style.display = 'none';
+    }
+
+    // Další
+    if (dalsi) {
+      document.getElementById('prev-dalsi-val').textContent = dalsi;
+      dalsiRow.style.display = '';
+    } else {
+      dalsiRow.style.display = 'none';
+    }
+
+    // Languages
+    const validLangs = languages.filter(l => l.name.trim());
+    if (validLangs.length) {
+      langList.innerHTML = validLangs.map(l => `
+        <div class="cv-lang-row">
+          <span class="cv-lang-name">${escHtml(l.name.trim())}</span>
+          <span class="cv-lang-level">${escHtml(l.level.trim())}</span>
+        </div>
+      `).join('');
+      langRow.style.display = '';
+    } else {
+      langList.innerHTML = '';
+      langRow.style.display = 'none';
+    }
+
+    // Hide entire skills section if everything empty
+    const skillsHasContent = tagArr.length || db || dalsi || validLangs.length;
+    skillsSection.style.display = skillsHasContent ? '' : 'none';
+
+    /* --- WORK EXPERIENCE --- */
+    const workSection = document.getElementById('prev-work-section');
+    const workList    = document.getElementById('prev-work-list');
+    const validWork   = workItems.filter(w => w.position.trim() || w.bullets.some(b => b.text.trim()));
+    if (validWork.length) {
+      workList.innerHTML = validWork.map(item => {
+        const bullets = item.bullets.filter(b => b.text.trim());
+        const bulletsHtml = bullets.length
+          ? `<ul>${bullets.map(b => `<li>${escHtml(b.text)}</li>`).join('')}</ul>`
+          : '';
+        return `
+          <div class="cv-work-item">
+            <div class="cv-work-position">${item.position.trim() ? `<span class="cv-work-position-badge">${escHtml(item.position.trim())}</span>` : ''}</div>
+            <div class="cv-work-bullets">${bulletsHtml}</div>
+          </div>
+        `;
+      }).join('');
+      workSection.style.display = '';
+    } else {
+      workSection.style.display = 'none';
+    }
+
+    /* --- PERSONAL SKILLS --- */
+    const personalSection = document.getElementById('prev-personal-section');
+    const personalText    = document.getElementById('prev-personal-text');
+    if (personal) {
+      personalText.textContent = personal;
+      personalSection.style.display = '';
+    } else {
+      personalSection.style.display = 'none';
+    }
+
+    /* --- EDUCATION --- */
+    const eduSection = document.getElementById('prev-edu-section');
+    const eduList    = document.getElementById('prev-edu-list');
+    const validEdu   = eduItems.filter(e => e.years.trim() || e.institution.trim() || e.degree.trim());
+    if (validEdu.length) {
+      eduList.innerHTML = validEdu.map(item => `
+        <div class="cv-edu-item">
+          <div class="cv-edu-years">${escHtml(item.years.trim())}</div>
+          <div class="cv-edu-details">
+            ${item.institution.trim() ? `<div class="cv-edu-institution">${escHtml(item.institution.trim())}</div>` : ''}
+            ${item.degree.trim() ? `<div class="cv-edu-degree">${escHtml(item.degree.trim())}</div>` : ''}
+          </div>
+        </div>
+      `).join('');
+      eduSection.style.display = '';
+    } else {
+      eduSection.style.display = 'none';
+    }
+
+    // Spusť layout algoritmus po překreslení DOM
+    requestAnimationFrame(computePrintLayout);
+  }
+
+  /* ============================================================
+     POMOCNÁ FUNKCE — výška A4 stránky v px
+  ============================================================ */
+  function getA4HeightPx() {
+    const ruler = document.createElement('div');
+    ruler.style.cssText = 'position:absolute;height:297mm;width:1px;visibility:hidden;pointer-events:none;';
+    document.body.appendChild(ruler);
+    const h = ruler.offsetHeight;
+    document.body.removeChild(ruler);
+    return h;
+  }
+
+  /* ============================================================
+     PRINT LAYOUT ALGORITMUS
+     ─────────────────────────────────────────────────────────────
+     Tři typy prvků:
+
+     1. JOB ITEM (.cv-work-item) — NEDĚLITELNÝ
+        Pokud se nevejde na aktuální stránku → jde na novou stránku
+        jako součást nového vizuálního segmentu.
+
+     2. WORK SECTION — DĚLITELNÁ (segmentovaná)
+        JS rozdělí sekci na N samostatných .cv-section divů.
+        Každý segment = plnohodnotný box s rounded corners na VŠECH
+        4 stranách. Žádný "ostrý řez" na konci stránky.
+
+     3. OSTATNÍ SEKCE (info, skills, personal, edu) — ATOMICKÉ
+        Celá sekce se přesune na novou stránku pokud se nevejde.
+     ─────────────────────────────────────────────────────────────
+     Pseudologika:
+       if (block.height <= remainingPageHeight) → render(block)
+       else → newPage(); render(block)
+  ============================================================ */
+  function computePrintLayout() {
+    const preview = document.getElementById('preview');
+    const workSec = document.getElementById('prev-work-section');
+
+    // ── 1. Reset ──────────────────────────────────────────────────
+    // Odstraň předchozí segmenty pracovní sekce
+    preview.querySelectorAll('[data-work-segment]').forEach(el => el.remove());
+
+    // Obnov pracovní sekci pokud byla schovaná kvůli segmentaci
+    if (workSec.hasAttribute('data-segmented')) {
+      workSec.style.display = '';
+      workSec.removeAttribute('data-segmented');
+    }
+
+    // Vymaž vynucené page breaks na atomických sekcích
+    preview.querySelectorAll('[data-forced-break]').forEach(el => {
+      el.style.breakBefore     = '';
+      el.style.pageBreakBefore = '';
+      el.removeAttribute('data-forced-break');
+    });
+    preview.querySelectorAll('.page-break-line').forEach(el => el.remove());
+
+    void preview.offsetHeight; // vynutit reflow pro přesné míry
+
+    // ── 2. Konstanty ──────────────────────────────────────────────
+    const a4H     = getA4HeightPx();
+    const PAD_TOP = 32;   // @page margin-top = bílá mezera nahoře na každé stránce
+    const PAD_BOT = 80;   // footer (~48px) + 32px mezera dole
+    const USABLE  = a4H - PAD_TOP - PAD_BOT; // použitelná výška obsahu na stránku
+    const SEC_PAD = 14;   // .cv-section padding-top = padding-bottom
+    const SEC_MB  = 12;   // .cv-section margin-bottom
+
+    const screenPadTop = parseFloat(window.getComputedStyle(preview).paddingTop) || 28;
+    const previewTop   = preview.getBoundingClientRect().top;
+
+    function printY(el) {
+      return el.getBoundingClientRect().top - previewTop - screenPadTop;
+    }
+    function isVisible(el) {
+      return el && el.style.display !== 'none' && el.offsetHeight > 0;
+    }
+    function forceBreakBefore(el) {
+      el.style.breakBefore     = 'page';
+      el.style.pageBreakBefore = 'always';
+      el.setAttribute('data-forced-break', '1');
+    }
+
+    // ── 3. Identifikuj sekce ──────────────────────────────────────
+    const infoSec     = document.getElementById('prev-info-section');
+    const skillsSec   = document.getElementById('prev-skills-section');
+    const personalSec = document.getElementById('prev-personal-section');
+    const eduSec      = document.getElementById('prev-edu-section');
+
+    const orderedSections = [infoSec, skillsSec, workSec, personalSec, eduSec];
+    const firstVisible    = orderedSections.find(s => isVisible(s));
+    if (!firstVisible) {
+      drawPageBreakLines(a4H, preview);
+      return;
+    }
+
+    // usedOnPage = výška obsahu nad první sekcí (header + margin)
+    let usedOnPage = Math.max(0, printY(firstVisible));
+
+    // ── 4. Zpracuj sekce v pořadí dokumentu ──────────────────────
+    orderedSections.forEach(sec => {
+      if (!isVisible(sec)) return;
+
+      const secMb = parseFloat(window.getComputedStyle(sec).marginBottom) || SEC_MB;
+      const secH  = sec.offsetHeight;
+
+      if (sec.id === 'prev-work-section') {
+        /* ── DĚLITELNÁ SEKCE: Pracovní zkušenosti ──────────────────
+           Rozdělíme sekci na samostatné vizuální segmenty.
+           Každý segment = .cv-section div s plnými rounded corners.
+           ─────────────────────────────────────────────────────── */
+
+        const titleEl = sec.querySelector('.cv-section-title');
+        const titleH  = titleEl
+          ? titleEl.offsetHeight + (parseFloat(window.getComputedStyle(titleEl).marginBottom) || 12)
+          : 0;
+
+        const items = [...sec.querySelectorAll('.cv-work-item')];
+
+        // Zahrni prostor pro padding + nadpis sekce na první stránce
+        usedOnPage += SEC_PAD + titleH;
+
+        // Rozhodni, které položky patří na kterou stránku
+        // segments[i] = pole .cv-work-item elementů pro stránku i
+        const segments = [[]];
+
+        items.forEach(item => {
+          const itemH  = item.offsetHeight;
+          const itemMb = parseFloat(window.getComputedStyle(item).marginBottom) || 0;
+          const total  = itemH + itemMb;
+
+          // + SEC_PAD rezervuje místo pro spodní padding segmentu (14px).
+          // Bez toho by segment div překročil USABLE a byl by oříznutý.
+          if (usedOnPage + itemH + SEC_PAD > USABLE) {
+            // Položka se nevejde → nový segment = nová stránka
+            segments.push([item]);
+            // Na nové stránce: padding-top nového segmentu (SEC_PAD) + položka
+            usedOnPage = SEC_PAD + total;
+          } else {
+            segments[segments.length - 1].push(item);
+            usedOnPage += total;
+          }
+        });
+
+        // Uzavření sekce: padding-bottom + margin-bottom
+        usedOnPage += SEC_PAD + secMb;
+
+        // ── Vytvoř vizuální segment divy ─────────────────────────
+        // Každý segment = nový .cv-section box s border-radius na všech stranách.
+        // Prázdné segmenty přeskočíme — nadpis patří vždy k prvnímu neprázdnému.
+        if (segments.length > 1) {
+          // Skryj původní sekci — nahradíme ji segmenty
+          sec.style.display = 'none';
+          sec.setAttribute('data-segmented', '1');
+
+          let insertAfter = sec;
+
+          // Index prvního neprázdného segmentu → sem patří nadpis sekce
+          const firstFilledIdx = segments.findIndex(s => s.length > 0);
+
+          segments.forEach((segItems, idx) => {
+            if (segItems.length === 0) return; // přeskoč prázdné segmenty
+
+            const segDiv = document.createElement('div');
+            segDiv.className = 'cv-section';
+            segDiv.setAttribute('data-work-segment', idx);
+
+            // Nadpis sekce patří do prvního neprázdného segmentu
+            // (může to být i segment[1] pokud segment[0] byl prázdný)
+            if (idx === firstFilledIdx && titleEl) {
+              segDiv.appendChild(titleEl.cloneNode(true));
+            }
+
+            // Klony položek do segmentu
+            segItems.forEach(item => segDiv.appendChild(item.cloneNode(true)));
+
+            // Segmenty s idx > 0 začínají na nové stránce
+            // (platí i pro segment[1] pokud byl segment[0] prázdný)
+            if (idx > 0) {
+              segDiv.style.breakBefore     = 'page';
+              segDiv.style.pageBreakBefore = 'always';
+            }
+
+            insertAfter.parentNode.insertBefore(segDiv, insertAfter.nextSibling);
+            insertAfter = segDiv;
+          });
+        }
+        // Pokud segments.length === 1 → vše se vešlo na jednu stránku,
+        // původní sekce zůstane beze změny.
+
+      } else {
+        /* ── ATOMICKÁ SEKCE ─────────────────────────────────────────
+           Celá sekce je nedělitelná jednotka.
+           Pokud se nevejde na aktuální stránku → přesuň CELOU na novou.
+        ───────────────────────────────────────────────────────── */
+        if (usedOnPage + secH > USABLE) {
+          forceBreakBefore(sec);
+          usedOnPage = secH + secMb;
+        } else {
+          usedOnPage += secH + secMb;
+        }
+      }
+    });
+
+    // ── 5. Překresli vizuální indikátory stránek v preview ────────
+    requestAnimationFrame(() => drawPageBreakLines(a4H, preview));
+  }
+
+  /* ============================================================
+     VIZUÁLNÍ INDIKÁTOR STRÁNEK v preview
+  ============================================================ */
+  function drawPageBreakLines(a4H, preview) {
+    preview.querySelectorAll('.page-break-line').forEach(el => el.remove());
+    const totalH = preview.scrollHeight;
+    let page = 1;
+    while (page * a4H < totalH) {
+      const line = document.createElement('div');
+      line.className = 'page-break-line';
+      line.style.top  = (page * a4H) + 'px';
+      preview.appendChild(line);
+      page++;
+    }
+  }
+
+  /* ============================================================
+     PDF EXPORT — window.print()
+  ============================================================ */
+  document.getElementById('btn-export').addEventListener('click', () => {
+    window.print();
+  });
+
+  /* ============================================================
+     INIT — render empty state
+  ============================================================ */
+  updatePreview();
+</script>
+</body>
+</html>
