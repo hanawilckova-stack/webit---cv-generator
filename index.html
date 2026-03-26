@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -380,7 +381,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 18px;
     }
 
     .cv-tag {
@@ -500,8 +501,8 @@
 
     .cv-work-bullets ul {
       list-style: disc;
-      list-style-position: inside;
-      padding-left: 0;
+      list-style-position: outside;
+      padding-left: 14px; /* tečka visí vlevo, text se zarovnává za ní */
       margin: 0;
     }
 
@@ -711,6 +712,7 @@
       }
     }
   </style>
+
 </head>
 <body>
 
@@ -1187,8 +1189,16 @@
     const langRow  = document.getElementById('prev-lang-row');
     const langList = document.getElementById('prev-lang-list');
 
-    // Tags
-    const tagArr = skills.split(',').map(s => s.trim()).filter(Boolean);
+    // Tags — čárky UVNITŘ závorek nerozdělují tag (např. "PHP (Nette, Symfony)" = 1 tag)
+    const tagArr = [];
+    let depth = 0, cur = '';
+    for (const ch of skills) {
+      if (ch === '(') { depth++; cur += ch; }
+      else if (ch === ')') { depth = Math.max(0, depth - 1); cur += ch; }
+      else if (ch === ',' && depth === 0) { const t = cur.trim(); if (t) tagArr.push(t); cur = ''; }
+      else { cur += ch; }
+    }
+    const last = cur.trim(); if (last) tagArr.push(last);
     if (tagArr.length) {
       tagsContainer.innerHTML = tagArr.map(t => `<span class="cv-tag">${escHtml(t)}</span>`).join('');
       tagsContainer.style.display = 'flex';
@@ -1519,6 +1529,8 @@
      INIT — render empty state
   ============================================================ */
   updatePreview();
+
+
 </script>
 </body>
 </html>
